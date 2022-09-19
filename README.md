@@ -1,0 +1,2 @@
+# RustHour
+Hackathon Challenge
