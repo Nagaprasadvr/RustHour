@@ -1,6 +1,6 @@
 use std::{collections::HashMap, fmt::Debug, io::Read};
 
-enum OpCodes {
+enum OpCode {
     LOAD_VAL,
     WRITE_VAR,
     READ_VAR,
@@ -12,18 +12,18 @@ enum OpCodes {
     NULL,
 }
 
-impl OpCodes {
+impl OpCode {
     fn new(a: &String) -> Self {
         match a.as_str() {
-            "LOAD_VAL" => OpCodes::LOAD_VAL,
-            "WRITE_VAR" => OpCodes::WRITE_VAR,
-            "READ_VAR" => OpCodes::READ_VAR,
-            "ADD" => OpCodes::ADD,
-            "SUB" => OpCodes::SUB,
-            "MUL" => OpCodes::MUL,
-            "DIV" => OpCodes::DIV,
-            "LOOP" => OpCodes::LOOP,
-            _ => OpCodes::NULL,
+            "LOAD_VAL" => OpCode::LOAD_VAL,
+            "WRITE_VAR" => OpCode::WRITE_VAR,
+            "READ_VAR" => OpCode::READ_VAR,
+            "ADD" => OpCode::ADD,
+            "SUB" => OpCode::SUB,
+            "MUL" => OpCode::MUL,
+            "DIV" => OpCode::DIV,
+            "LOOP" => OpCode::LOOP,
+            _ => OpCode::NULL,
         }
     }
 }
@@ -79,17 +79,17 @@ where
         // println!("Elements:{:?}", var);
         let tmp: Vec<&str> = code.split(" ").collect();
 
-        match OpCodes::new(&tmp[0].to_string()) {
-            OpCodes::LOAD_VAL => loaded.push(tmp[1].parse().unwrap()),
-            OpCodes::WRITE_VAR => {
+        match OpCode::new(&tmp[0].to_string()) {
+            OpCode::LOAD_VAL => loaded.push(tmp[1].parse().unwrap()),
+            OpCode::WRITE_VAR => {
                 varnames.push(&tmp[1][1..2]);
 
                 var.insert(varnames.pop().unwrap(), loaded.pop().unwrap());
             }
-            OpCodes::READ_VAR => {
+            OpCode::READ_VAR => {
                 loaded.push(var[&tmp[1][1..2]]);
             }
-            OpCodes::ADD => {
+            OpCode::ADD => {
                 println!("Performing Addition...");
                 let op2 = loaded.pop().unwrap();
                 let op1 = loaded.pop().unwrap();
@@ -97,7 +97,7 @@ where
                 loaded.push(temp);
                 println!("Result:{:?}", temp);
             }
-            OpCodes::SUB => {
+            OpCode::SUB => {
                 println!("Performing Subtraction...");
                 let op2 = loaded.pop().unwrap();
                 let op1 = loaded.pop().unwrap();
@@ -105,7 +105,7 @@ where
                 loaded.push(temp);
                 println!("Result:{:?}", temp);
             }
-            OpCodes::DIV => {
+            OpCode::DIV => {
                 println!("Performing Division...");
                 let op2 = loaded.pop().unwrap();
                 let op1 = loaded.pop().unwrap();
@@ -113,7 +113,7 @@ where
                 loaded.push(temp);
                 println!("Result:{:?}", temp);
             }
-            OpCodes::MUL => {
+            OpCode::MUL => {
                 println!("Performing Multiplication...");
                 let op2 = loaded.pop().unwrap();
                 let op1 = loaded.pop().unwrap();
@@ -121,13 +121,12 @@ where
                 loaded.push(temp);
                 println!("Result:{:?}", temp);
             }
-            OpCodes::NULL => {
+            OpCode::NULL => {
                 println!("Error in Bytecode");
                 return Err("Invalid bytecode".to_string());
             }
-            OpCodes::LOOP => {
+            OpCode::LOOP => {
                 println!("Entering a Loop..");
-                
             }
         }
     }
