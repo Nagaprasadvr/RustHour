@@ -1,5 +1,3 @@
-type ByteCode = Vec<String>;
-
 pub enum OpCode {
     LOAD_VAL,
     WRITE_VAR,
@@ -10,6 +8,7 @@ pub enum OpCode {
     DIV,
     LOOP,
     NULL,
+    RETURN_VAL,
 }
 
 impl OpCode {
@@ -23,14 +22,16 @@ impl OpCode {
             "MUL" => OpCode::MUL,
             "DIV" => OpCode::DIV,
             "LOOP" => OpCode::LOOP,
+            "RETURN_VAL" => OpCode::RETURN_VAL,
             _ => OpCode::NULL,
         }
     }
 }
 
 pub mod Interpreter {
-    use super::{ByteCode, OpCode};
-    use std::collections::HashMap;
+    pub type ByteCode = Vec<String>;
+    use super::OpCode;
+    use std::{collections::HashMap, ops::Index, process::exit};
 
     pub fn interpret<
         T: std::str::FromStr
@@ -40,10 +41,13 @@ pub mod Interpreter {
             + std::ops::Add<Output = T>
             + std::ops::Sub<Output = T>
             + std::ops::Div<Output = T>
-            + std::ops::Mul<Output = T>,
+            + std::ops::Mul<Output = T>
+            + PartialEq
+            + PartialOrd
+            + num_traits::Zero,
     >(
         bytecode: &ByteCode,
-    ) -> Result<(), String>
+    ) -> Result<T, String>
     where
         <T as std::str::FromStr>::Err: std::fmt::Debug,
     {
@@ -85,6 +89,9 @@ pub mod Interpreter {
                     println!("Performing Division...");
                     let op2 = loaded.pop().unwrap();
                     let op1 = loaded.pop().unwrap();
+                    if op2 == T::zero() {
+                        return Err("Division by zero error!".to_owned());
+                    }
                     let temp = op1 / op2;
                     loaded.push(temp);
                     println!("Result:{:?}", temp);
@@ -104,9 +111,12 @@ pub mod Interpreter {
                 OpCode::LOOP => {
                     println!("Entering a Loop..");
                 }
+                OpCode::RETURN_VAL => {
+                    return Ok(var[&tmp[1][1..2]]);
+                }
             }
         }
 
-        Ok(())
+        Ok(loaded.pop().unwrap())
     }
 }
