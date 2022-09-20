@@ -1,7 +1,10 @@
+#![feature(test)]
+extern crate test;
 use std::fs::File;
 use std::io::stdin;
 use std::io::{BufRead, BufReader};
 use walkdir::WalkDir;
+
 fn main() {
     let mut dir = String::new();
     println!("Enter the directory name:");
@@ -47,32 +50,87 @@ fn search(path: &str, ext: &str) -> Vec<u8> {
 
 #[cfg(test)]
 mod FileSearchtest {
+    use test::Bencher;
+
     use crate::search;
 
     #[test]
     fn test1() {
         assert_eq!(
-            search("/Users/home/rusthour/Rusthour/f2", ".py"),
+            search(
+                "/Users/home/rusthour/sample_folders_for_file_search/f2",
+                ".py"
+            ),
             vec![0, 1]
         );
     }
     #[test]
     fn test2() {
-        assert_eq!(search("/Users/home/rusthour/Rusthour/f2", ".rs"), vec![3]);
+        assert_eq!(
+            search(
+                "/Users/home/rusthour/sample_folders_for_file_search/f2",
+                ".rs"
+            ),
+            vec![3]
+        );
     }
     #[test]
     fn test3() {
-        assert_eq!(search("/Users/home/rusthour/Rusthour/f2", ".rs"), vec![3]);
+        assert_eq!(
+            search(
+                "/Users/home/rusthour/sample_folders_for_file_search/f2",
+                ".rs"
+            ),
+            vec![3]
+        );
     }
     #[test]
     fn test4() {
-        assert_eq!(search("/Users/home/rusthour/Rusthour", ".rs"), vec![3, 3]);
+        assert_eq!(
+            search("/Users/home/rusthour/sample_folders_for_file_search", ".rs"),
+            vec![3, 3]
+        );
     }
     #[test]
     fn test5() {
         assert_eq!(
-            search("/Users/home/rusthour/Rusthour", ".py"),
+            search("/Users/home/rusthour/sample_folders_for_file_search", ".py"),
             vec![0, 1, 1]
         );
+    }
+    #[bench]
+    fn bench1(b: &mut Bencher) {
+        b.iter(|| search("/Users/home/rusthour/sample_folders_for_file_search", ".rs"))
+    }
+    #[bench]
+    fn bench5(b: &mut Bencher) {
+        b.iter(|| search("/Users/home/rusthour/sample_folders_for_file_search", ".py"))
+    }
+    #[bench]
+    fn bench2(b: &mut Bencher) {
+        b.iter(|| {
+            search(
+                "/Users/home/rusthour/sample_folders_for_file_search/f2",
+                ".rs",
+            )
+        })
+    }
+    #[bench]
+    fn bench3(b: &mut Bencher) {
+        b.iter(|| {
+            search(
+                "/Users/home/rusthour/sample_folders_for_file_search/f2",
+                ".rs",
+            )
+        })
+    }
+    #[bench]
+    fn bench4(b: &mut Bencher) {
+        b.iter(|| {
+            search(
+                "/Users/home/rusthour/sample_folders_for_file_search/f2/f3",
+                ".py",
+            )
+        })
     }
 }
